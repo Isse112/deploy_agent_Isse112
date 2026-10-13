@@ -62,3 +62,29 @@ deploy_app() {
 archive_logs() {
     echo "Archive feature is not finished yet - coming in the next steps."
 }
+
+#
+# Main menu: let the user pick a feature
+#
+echo ""
+echo "What would you like to do?"
+echo "  1) Deploy a new project"
+echo "  2) Run an already deployed project"
+echo "  3) Archive the log files"
+read -p "Enter your choice (1-3): " choice
+
+case $choice in
+    1)
+        deploy_app
+        ;;
+    2)
+        run_app
+        ;;
+    3)
+        archive_logs
+        ;;
+    *)
+        echo "Invalid choice. Please run the script again and enter 1, 2, or 3."
+        exit 1
+        ;;
+esac
