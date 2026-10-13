@@ -32,3 +32,19 @@ if [ $? -ne 0 ]; then
 fi
 
 echo "Pre-flight checks passed: python3 and zip are installed."
+
+# 
+# Feature 2: Run an already deployed project
+# 
+run_app() {
+    read -p "Enter the project name you want to run (the {name} part of attendance_tracker_{name}): " project_name
+    project_dir="attendance_tracker_${project_name}"
+
+    if [ ! -d "$project_dir" ]; then
+        echo "ERROR: $project_dir does not exist. Deploy it first."
+        exit 1
+    fi
+
+    cd "$project_dir"
+    python3 attendance_checker.py
+}
