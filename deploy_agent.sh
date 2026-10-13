@@ -15,3 +15,20 @@
 #
 
 echo "deploy_agent.sh is starting..."
+
+# 
+# Pre-flight checks: make sure python3 and zip are installed
+#
+command -v python3 > /dev/null
+if [ $? -ne 0 ]; then
+    echo "ERROR: python3 is not installed. Please install it first."
+    exit 1
+fi
+
+command -v zip > /dev/null
+if [ $? -ne 0 ]; then
+    echo "ERROR: zip is not installed. Please install it first."
+    exit 1
+fi
+
+echo "Pre-flight checks passed: python3 and zip are installed."
