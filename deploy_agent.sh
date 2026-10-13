@@ -48,3 +48,17 @@ run_app() {
     cd "$project_dir"
     python3 attendance_checker.py
 }
+
+#
+# Feature 1: Deploy a new project (built in later steps)
+#
+deploy_app() {
+    echo "Deploy feature is not finished yet - coming in the next steps."
+}
+
+#
+# Feature 3: Archive the log files (built in later steps)
+#
+archive_logs() {
+    echo "Archive feature is not finished yet - coming in the next steps."
+}
