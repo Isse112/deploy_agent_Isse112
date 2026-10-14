@@ -16,7 +16,7 @@
 
 echo "deploy_agent.sh is starting..."
 
-# 
+#
 # Pre-flight checks: make sure python3 and zip are installed
 #
 command -v python3 > /dev/null
@@ -53,7 +53,23 @@ run_app() {
 # Feature 1: Deploy a new project (built in later steps)
 #
 deploy_app() {
-    echo "Deploy feature is not finished yet - coming in the next steps."
+	    read -p "Enter a name for your new project (it will be created as attendance_tracker_<name>): " deploy_name
+    deploy_dir="attendance_tracker_${deploy_name}"
+
+    if [ -d "$deploy_dir" ]; then
+        echo "$deploy_dir already exists."
+        read -p "Overwrite it? (y/n): " overwrite_choice
+
+        if [ "$overwrite_choice" = "y" ] || [ "$overwrite_choice" = "Y" ]; then
+            echo "Removing old $deploy_dir ..."
+            rm -rf "$deploy_dir"
+        else
+            echo "Aborting. Existing project was not touched."
+            exit 1
+        fi
+    fi
+
+    echo "Ready to create $deploy_dir"
 }
 
 #
