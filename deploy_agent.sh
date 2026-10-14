@@ -69,7 +69,65 @@ deploy_app() {
         fi
     fi
 
-    echo "Ready to create $deploy_dir"
+        echo "Creating $deploy_dir ..."
+    mkdir -p "$deploy_dir/Helpers"
+    mkdir -p "$deploy_dir/reports"
+
+    cp templates/attendance_checker.py "$deploy_dir/attendance_checker.py"
+    cp templates/config.json "$deploy_dir/Helpers/config.json"
+
+    echo ""
+    echo "How do you want to build the student roster (assets.csv)?"
+    echo "  A) Copy rows from templates/assets.csv"
+    echo "  B) Generate a fresh roster (all counts start at 0)"
+    read -p "Enter A or B: " roster_choice
+
+    if [ "$roster_choice" = "A" ] || [ "$roster_choice" = "a" ]; then
+        read -p "How many students to copy (1-10)? " student_count
+        head -n 1 templates/assets.csv > "$deploy_dir/Helpers/assets.csv"
+        tail -n +2 templates/assets.csv | head -n "$student_count" >> "$deploy_dir/Helpers/assets.csv"
+        echo "Copied $student_count student(s) from templates/assets.csv."
+        echo "Keeping total_sessions as shipped (5), consistent with the 4 prior sessions in the template roster."
+    else
+        read -p "How many students to generate? " student_count
+
+        names=("Kevin Brown" "Laura Chen" "Mohammed Ali" "Nina Patel" "Omar Said" "Priya Singh" "Quinn Adams" "Rachel Kim" "Samuel Otieno" "Tasha Grant" "Umar Farouk" "Victoria Cruz" "Wendy Zhao" "Xavier Young" "Yara Haddad")
+        emails=("kevin@example.com" "laura@example.com" "mohammed@example.com" "nina@example.com" "omar@example.com" "priya@example.com" "quinn@example.com" "rachel@example.com" "samuel@example.com" "tasha@example.com" "umar@example.com" "victoria@example.com" "wendy@example.com" "xavier@example.com" "yara@example.com")
+
+        echo "Email,Names,Attendance Count,Absence Count" > "$deploy_dir/Helpers/assets.csv"
+        for ((i=0; i<student_count; i++)); do
+            echo "${emails[$i]},${names[$i]},0,0" >> "$deploy_dir/Helpers/assets.csv"
+        done
+
+        echo "Generated $student_count fresh student row(s) with counts starting at 0."
+
+        sed -i "s/\"total_sessions\": [0-9]*/\"total_sessions\": 1/" "$deploy_dir/Helpers/config.json"
+        echo "Set total_sessions to 1 in config.json (fresh roster = session one)."
+    fi
+
+    chmod +x "$deploy_dir/attendance_checker.py"
+    chmod 600 "$deploy_dir/Helpers/config.json"
+    echo "Permissions set: attendance_checker.py is executable; Helpers/config.json is restricted to owner read/write only (600)."
+
+    echo ""
+    read -p "Update the attendance alert thresholds now? (y/n): " threshold_choice
+    if [ "$threshold_choice" = "y" ] || [ "$threshold_choice" = "Y" ]; then
+        read -p "Enter warning threshold (default 75): " new_warning
+        new_warning=${new_warning:-75}
+        read -p "Enter failure threshold (default 50): " new_failure
+        new_failure=${new_failure:-50}
+
+        sed -i "s/\"warning\": [0-9]*/\"warning\": $new_warning/" "$deploy_dir/Helpers/config.json"
+        sed -i "s/\"failure\": [0-9]*/\"failure\": $new_failure/" "$deploy_dir/Helpers/config.json"
+        chmod 600 "$deploy_dir/Helpers/config.json"
+
+        echo "Updated thresholds: warning=$new_warning, failure=$new_failure."
+    fi
+
+    echo ""
+    echo "Verifying deployment by running the application..."
+    cd "$deploy_dir"
+    python3 attendance_checker.py
 }
 
 #
