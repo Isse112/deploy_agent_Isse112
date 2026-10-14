@@ -52,6 +52,19 @@ run_app() {
 #
 # Feature 1: Deploy a new project (built in later steps)
 #
+handle_deploy_interrupt() {
+    echo ""
+    echo "Deployment interrupted - archiving what was created so far..."
+
+    if [ -d "$deploy_dir" ]; then
+        zip -r "${deploy_dir}_archive.zip" "$deploy_dir" > /dev/null
+        echo "Incomplete project archived to ${deploy_dir}_archive.zip"
+    else
+        echo "Nothing was created yet - no archive needed."
+    fi
+
+    exit 1
+}
 deploy_app() {
 	    read -p "Enter a name for your new project (it will be created as attendance_tracker_<name>): " deploy_name
     deploy_dir="attendance_tracker_${deploy_name}"
@@ -69,6 +82,7 @@ deploy_app() {
         fi
     fi
 
+        trap handle_deploy_interrupt SIGINT SIGTSTP
         echo "Creating $deploy_dir ..."
     mkdir -p "$deploy_dir/Helpers"
     mkdir -p "$deploy_dir/reports"
@@ -125,6 +139,7 @@ deploy_app() {
     fi
 
     echo ""
+        trap - SIGINT SIGTSTP
     echo "Verifying deployment by running the application..."
     cd "$deploy_dir"
     python3 attendance_checker.py
