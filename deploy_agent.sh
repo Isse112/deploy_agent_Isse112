@@ -76,7 +76,34 @@ deploy_app() {
 # Feature 3: Archive the log files (built in later steps)
 #
 archive_logs() {
-    echo "Archive feature is not finished yet - coming in the next steps."
+	    read -p "Enter the project name whose logs you want to archive (the {name} part of attendance_tracker_{name}): " archive_project_name
+    project_dir="attendance_tracker_${archive_project_name}"
+
+    if [ ! -d "$project_dir" ]; then
+        echo "ERROR: $project_dir does not exist."
+        exit 1
+    fi
+
+    timestamp=$(date +%Y%m%d_%H%M%S)
+
+    mkdir -p "$project_dir/archives/attendance"
+    mkdir -p "$project_dir/archives/absent"
+
+    if [ -f "$project_dir/reports/attendance.log" ]; then
+        attendance_archive="$project_dir/archives/attendance/attendance_${timestamp}.log"
+        cp "$project_dir/reports/attendance.log" "$attendance_archive"
+        echo "Archived attendance.log -> $attendance_archive"
+    else
+        echo "No attendance.log found in $project_dir/reports/ - skipping."
+    fi
+
+    if [ -f "$project_dir/reports/absent.log" ]; then
+        absent_archive="$project_dir/archives/absent/absent_${timestamp}.log"
+        cp "$project_dir/reports/absent.log" "$absent_archive"
+        echo "Archived absent.log -> $absent_archive"
+    else
+        echo "No absent.log found in $project_dir/reports/ - skipping."
+    fi
 }
 
 #
