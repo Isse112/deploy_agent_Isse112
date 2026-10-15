@@ -96,3 +96,8 @@ Contains the three unmodified source files used to populate every new deployment
 - attendance_checker.py
 - config.json
 - assets.csv
+
+
+## Walkthrough Video
+
+Watch the walkthrough and demo here: https://youtu.be/T044tU1o_iQ
